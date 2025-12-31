@@ -32,8 +32,8 @@ app.use('/api/*', cors({
   allowHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Servir arquivos estáticos
-app.use('/static/*', serveStatic({ root: './public' }));
+// Servir arquivos estáticos CSS/JS
+app.use('/static/*', serveStatic({ root: '.' }));
 
 // ============================================================================
 // API ROUTES
