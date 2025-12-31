@@ -27,12 +27,12 @@
  */
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDf2WKMfvtd8Pv_BlS2W928bqp24_v-pew",
+  authDomain: "yieldlab-76d87.firebaseapp.com",
+  projectId: "yieldlab-76d87",
+  storageBucket: "yieldlab-76d87.firebasestorage.app",
+  messagingSenderId: "518012596078",
+  appId: "1:518012596078:web:aaedade2c0963b35b15b7f"
 };
 
 // Validação de configuração

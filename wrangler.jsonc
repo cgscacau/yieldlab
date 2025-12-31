@@ -1,14 +1,15 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "webapp",
+  "name": "yieldlab",
   "compatibility_date": "2025-12-31",
   "pages_build_output_dir": "./dist",
   "compatibility_flags": [
     "nodejs_compat"
-  ]
-  // "vars": {
-  //   "MY_VAR": "my-variable"
-  // },
+  ],
+  "vars": {
+    "FIREBASE_PROJECT_ID": "yieldlab-76d87",
+    "FIREBASE_API_KEY": "AIzaSyDf2WKMfvtd8Pv_BlS2W928bqp24_v-pew"
+  }
   // "kv_namespaces": [
   //   {
   //     "binding": "MY_KV_NAMESPACE",
