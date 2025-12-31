@@ -1,5 +1,5 @@
 // ============================================================================
-// CALCULATIONS UTILITY - InvestFolio
+// CALCULATIONS UTILITY - YieldLab
 // ============================================================================
 
 import type { Asset, Transaction, Dividend, PortfolioMetrics, AssetAllocation, SectorAllocation } from '../types';

@@ -1,5 +1,5 @@
 // ============================================================================
-// INVESTFOLIO - Main Application
+// YIELDLAB - Main Application
 // Sistema de Gestão de Investimentos
 // ============================================================================
 
@@ -159,7 +159,7 @@ app.get('/api/health', (c) => {
     success: true,
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    service: 'InvestFolio API'
+    service: 'YieldLab API'
   });
 });
 
@@ -174,7 +174,7 @@ app.get('/', (c) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>InvestFolio - Gestão de Investimentos</title>
+        <title>YieldLab - Gestão de Investimentos</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     </head>
@@ -185,7 +185,7 @@ app.get('/', (c) => {
                 <div class="flex justify-between h-16">
                     <div class="flex items-center">
                         <i class="fas fa-chart-line text-indigo-600 text-3xl mr-3"></i>
-                        <span class="text-2xl font-bold text-gray-900">InvestFolio</span>
+                        <span class="text-2xl font-bold text-gray-900">YieldLab</span>
                     </div>
                     <div class="flex items-center space-x-4">
                         <a href="/dashboard" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
@@ -288,7 +288,7 @@ app.get('/', (c) => {
         <footer class="bg-white mt-20 border-t">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div class="text-center text-gray-600">
-                    <p>&copy; 2024 InvestFolio. Powered by Hono + Firebase + Cloudflare Pages.</p>
+                    <p>&copy; 2024 YieldLab. Powered by Hono + Firebase + Cloudflare Pages.</p>
                     <p class="mt-2 text-sm">
                         <a href="/api/health" class="text-indigo-600 hover:underline">API Status</a> | 
                         <a href="https://github.com" class="text-indigo-600 hover:underline ml-2">GitHub</a>

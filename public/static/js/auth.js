@@ -13,8 +13,8 @@ class AuthService {
    * Carrega dados do usuário do localStorage
    */
   loadFromStorage() {
-    const userData = localStorage.getItem('investfolio_user');
-    const token = localStorage.getItem('investfolio_token');
+    const userData = localStorage.getItem('yieldlab_user');
+    const token = localStorage.getItem('yieldlab_token');
     
     if (userData && token) {
       this.currentUser = JSON.parse(userData);
@@ -26,8 +26,8 @@ class AuthService {
    * Salva dados do usuário no localStorage
    */
   saveToStorage(user, token) {
-    localStorage.setItem('investfolio_user', JSON.stringify(user));
-    localStorage.setItem('investfolio_token', token);
+    localStorage.setItem('yieldlab_user', JSON.stringify(user));
+    localStorage.setItem('yieldlab_token', token);
     this.currentUser = user;
     this.token = token;
   }
@@ -36,8 +36,8 @@ class AuthService {
    * Remove dados do localStorage
    */
   clearStorage() {
-    localStorage.removeItem('investfolio_user');
-    localStorage.removeItem('investfolio_token');
+    localStorage.removeItem('yieldlab_user');
+    localStorage.removeItem('yieldlab_token');
     this.currentUser = null;
     this.token = null;
   }

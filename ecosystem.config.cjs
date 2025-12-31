@@ -1,11 +1,11 @@
 // ============================================================================
-// PM2 CONFIGURATION - InvestFolio
+// PM2 CONFIGURATION - YieldLab
 // ============================================================================
 
 module.exports = {
   apps: [
     {
-      name: 'investfolio',
+      name: 'yieldlab',
       script: 'npx',
       args: 'wrangler pages dev dist --ip 0.0.0.0 --port 3000',
       env: {

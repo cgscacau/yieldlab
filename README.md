@@ -1,4 +1,4 @@
-# 💰 InvestFolio - Sistema de Gestão de Investimentos
+# 💰 YieldLab - Sistema de Gestão de Investimentos
 
 Sistema completo de gestão de investimentos desenvolvido com **Hono Framework**, **Firebase** e **Cloudflare Pages**. Uma alternativa moderna e gratuita ao Smartfolio/Meus Dividendos.
 
@@ -197,7 +197,7 @@ webapp/
 #### 1.1. Criar Projeto Firebase
 1. Acesse https://console.firebase.google.com/
 2. Clique em "Adicionar projeto"
-3. Escolha um nome (ex: `investfolio`)
+3. Escolha um nome (ex: `yieldlab`)
 4. Desabilite Google Analytics (opcional)
 5. Clique em "Criar projeto"
 
@@ -220,16 +220,16 @@ webapp/
 1. Vá em **Configurações do projeto** (ícone engrenagem)
 2. Role até "Seus aplicativos"
 3. Clique no ícone **Web** (`</>`)
-4. Registre o app (nome: `InvestFolio`)
+4. Registre o app (nome: `YieldLab`)
 5. Copie o objeto `firebaseConfig`
 6. Cole em `public/static/js/firebase-config.js`:
 
 ```javascript
 const firebaseConfig = {
   apiKey: "AIza...",
-  authDomain: "investfolio-xxxxx.firebaseapp.com",
-  projectId: "investfolio-xxxxx",
-  storageBucket: "investfolio-xxxxx.appspot.com",
+  authDomain: "yieldlab-xxxxx.firebaseapp.com",
+  projectId: "yieldlab-xxxxx",
+  storageBucket: "yieldlab-xxxxx.appspot.com",
   messagingSenderId: "123456789",
   appId: "1:123456789:web:abcdef"
 };
@@ -312,7 +312,7 @@ npx wrangler login
 
 ```bash
 # Cria projeto no Cloudflare Pages
-npx wrangler pages project create investfolio \
+npx wrangler pages project create yieldlab \
   --production-branch main \
   --compatibility-date 2024-01-01
 ```
