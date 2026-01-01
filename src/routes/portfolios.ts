@@ -30,6 +30,11 @@ portfolios.get('/', async (c) => {
         try {
           const assets = await firestore.getAssetsByPortfolioId(portfolio.id);
           
+          console.log(`📊 Portfolio ${portfolio.id}: ${assets.length} assets`);
+          assets.forEach(a => {
+            console.log(`  - ${a.ticker}: qty=${a.quantity}, avg=${a.averageCost}, cur=${a.currentPrice}`);
+          });
+          
           const totalInvested = assets.reduce((sum, a) => 
             sum + ((a.averageCost || 0) * (a.quantity || 0)), 0
           );
@@ -41,6 +46,8 @@ portfolios.get('/', async (c) => {
           const profitLoss = totalValue - totalInvested;
           const profitLossPercent = totalInvested > 0 ? (profitLoss / totalInvested) * 100 : 0;
           
+          console.log(`💰 Invested: R$ ${totalInvested}, Value: R$ ${totalValue}, Profit: R$ ${profitLoss}`);
+          
           return {
             ...portfolio,
             totalInvested,
@@ -50,7 +57,7 @@ portfolios.get('/', async (c) => {
             assetsCount: assets.length
           };
         } catch (assetError) {
-          console.error(`Error loading assets for portfolio ${portfolio.id}:`, assetError);
+          console.error(`❌ Error loading assets for portfolio ${portfolio.id}:`, assetError);
           // Retornar portfólio sem métricas em caso de erro
           return {
             ...portfolio,
