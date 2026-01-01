@@ -10,7 +10,7 @@ import type { Portfolio, Asset, Transaction, Dividend } from '../types';
  * Não requer bibliotecas Node.js, compatível com Cloudflare Workers
  */
 
-const FIREBASE_PROJECT_ID = 'YOUR_PROJECT_ID'; // Substituir pela variável de ambiente
+const FIREBASE_PROJECT_ID = 'yieldlab-76d87'; // Substituir pela variável de ambiente
 const FIRESTORE_BASE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
 
 interface FirestoreDocument {

@@ -19,7 +19,7 @@ assets.get('/:portfolioId', async (c) => {
     const portfolioId = c.req.param('portfolioId');
     const user = c.get('user');
     const token = c.get('firebaseToken');
-    const projectId = c.env?.FIREBASE_PROJECT_ID || 'YOUR_PROJECT_ID';
+    const projectId = c.env?.FIREBASE_PROJECT_ID || 'yieldlab-76d87';
     
     const firestore = new FirestoreService(token, projectId);
     
@@ -54,7 +54,7 @@ assets.post('/', async (c) => {
   try {
     const user = c.get('user');
     const token = c.get('firebaseToken');
-    const projectId = c.env?.FIREBASE_PROJECT_ID || 'YOUR_PROJECT_ID';
+    const projectId = c.env?.FIREBASE_PROJECT_ID || 'yieldlab-76d87';
     const body = await c.req.json();
 
     const { portfolioId, ticker, name, type, quantity, averageCost, currentPrice, sector } = body;
@@ -115,7 +115,7 @@ assets.patch('/:id', async (c) => {
     const assetId = c.req.param('id');
     const user = c.get('user');
     const token = c.get('firebaseToken');
-    const projectId = c.env?.FIREBASE_PROJECT_ID || 'YOUR_PROJECT_ID';
+    const projectId = c.env?.FIREBASE_PROJECT_ID || 'yieldlab-76d87';
     const body = await c.req.json();
 
     const firestore = new FirestoreService(token, projectId);
@@ -160,7 +160,7 @@ assets.delete('/:id', async (c) => {
     const assetId = c.req.param('id');
     const user = c.get('user');
     const token = c.get('firebaseToken');
-    const projectId = c.env?.FIREBASE_PROJECT_ID || 'YOUR_PROJECT_ID';
+    const projectId = c.env?.FIREBASE_PROJECT_ID || 'yieldlab-76d87';
     const portfolioId = c.req.query('portfolioId');
 
     if (!portfolioId) {

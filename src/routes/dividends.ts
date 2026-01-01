@@ -19,7 +19,7 @@ dividends.get('/:portfolioId', async (c) => {
     const portfolioId = c.req.param('portfolioId');
     const user = c.get('user');
     const token = c.get('firebaseToken');
-    const projectId = c.env?.FIREBASE_PROJECT_ID || 'YOUR_PROJECT_ID';
+    const projectId = c.env?.FIREBASE_PROJECT_ID || 'yieldlab-76d87';
     
     const firestore = new FirestoreService(token, projectId);
     const portfolio = await firestore.getPortfolioById(portfolioId);
@@ -43,7 +43,7 @@ dividends.post('/', async (c) => {
   try {
     const user = c.get('user');
     const token = c.get('firebaseToken');
-    const projectId = c.env?.FIREBASE_PROJECT_ID || 'YOUR_PROJECT_ID';
+    const projectId = c.env?.FIREBASE_PROJECT_ID || 'yieldlab-76d87';
     const body = await c.req.json();
 
     const { portfolioId, assetId, ticker, type, amount, quantity, paymentDate, exDate } = body;

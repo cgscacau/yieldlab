@@ -19,7 +19,7 @@ portfolios.get('/', async (c) => {
   try {
     const user = c.get('user');
     const token = c.get('firebaseToken');
-    const projectId = c.env?.FIREBASE_PROJECT_ID || 'YOUR_PROJECT_ID';
+    const projectId = c.env?.FIREBASE_PROJECT_ID || 'yieldlab-76d87';
     
     const firestore = new FirestoreService(token, projectId);
     const userPortfolios = await firestore.getPortfoliosByUserId(user.uid);
@@ -27,27 +27,40 @@ portfolios.get('/', async (c) => {
     // Calcular valores de cada portfólio
     const portfoliosWithMetrics = await Promise.all(
       userPortfolios.map(async (portfolio) => {
-        const assets = await firestore.getAssetsByPortfolioId(portfolio.id);
-        
-        const totalInvested = assets.reduce((sum, a) => 
-          sum + ((a.averageCost || 0) * (a.quantity || 0)), 0
-        );
-        
-        const totalValue = assets.reduce((sum, a) => 
-          sum + ((a.currentPrice || a.averageCost || 0) * (a.quantity || 0)), 0
-        );
-        
-        const profitLoss = totalValue - totalInvested;
-        const profitLossPercent = totalInvested > 0 ? (profitLoss / totalInvested) * 100 : 0;
-        
-        return {
-          ...portfolio,
-          totalInvested,
-          totalValue,
-          profitLoss,
-          profitLossPercent,
-          assetsCount: assets.length
-        };
+        try {
+          const assets = await firestore.getAssetsByPortfolioId(portfolio.id);
+          
+          const totalInvested = assets.reduce((sum, a) => 
+            sum + ((a.averageCost || 0) * (a.quantity || 0)), 0
+          );
+          
+          const totalValue = assets.reduce((sum, a) => 
+            sum + ((a.currentPrice || a.averageCost || 0) * (a.quantity || 0)), 0
+          );
+          
+          const profitLoss = totalValue - totalInvested;
+          const profitLossPercent = totalInvested > 0 ? (profitLoss / totalInvested) * 100 : 0;
+          
+          return {
+            ...portfolio,
+            totalInvested,
+            totalValue,
+            profitLoss,
+            profitLossPercent,
+            assetsCount: assets.length
+          };
+        } catch (assetError) {
+          console.error(`Error loading assets for portfolio ${portfolio.id}:`, assetError);
+          // Retornar portfólio sem métricas em caso de erro
+          return {
+            ...portfolio,
+            totalInvested: 0,
+            totalValue: 0,
+            profitLoss: 0,
+            profitLossPercent: 0,
+            assetsCount: 0
+          };
+        }
       })
     );
 
@@ -72,7 +85,7 @@ portfolios.get('/:id', async (c) => {
     const portfolioId = c.req.param('id');
     const user = c.get('user');
     const token = c.get('firebaseToken');
-    const projectId = c.env?.FIREBASE_PROJECT_ID || 'YOUR_PROJECT_ID';
+    const projectId = c.env?.FIREBASE_PROJECT_ID || 'yieldlab-76d87';
     
     const firestore = new FirestoreService(token, projectId);
     const portfolio = await firestore.getPortfolioById(portfolioId);
@@ -112,7 +125,7 @@ portfolios.post('/', async (c) => {
   try {
     const user = c.get('user');
     const token = c.get('firebaseToken');
-    const projectId = c.env?.FIREBASE_PROJECT_ID || 'YOUR_PROJECT_ID';
+    const projectId = c.env?.FIREBASE_PROJECT_ID || 'yieldlab-76d87';
     const body = await c.req.json();
 
     const { name, description } = body;
@@ -157,7 +170,7 @@ portfolios.patch('/:id', async (c) => {
     const portfolioId = c.req.param('id');
     const user = c.get('user');
     const token = c.get('firebaseToken');
-    const projectId = c.env?.FIREBASE_PROJECT_ID || 'YOUR_PROJECT_ID';
+    const projectId = c.env?.FIREBASE_PROJECT_ID || 'yieldlab-76d87';
     const body = await c.req.json();
 
     const firestore = new FirestoreService(token, projectId);
@@ -206,7 +219,7 @@ portfolios.delete('/:id', async (c) => {
     const portfolioId = c.req.param('id');
     const user = c.get('user');
     const token = c.get('firebaseToken');
-    const projectId = c.env?.FIREBASE_PROJECT_ID || 'YOUR_PROJECT_ID';
+    const projectId = c.env?.FIREBASE_PROJECT_ID || 'yieldlab-76d87';
 
     const firestore = new FirestoreService(token, projectId);
     const portfolio = await firestore.getPortfolioById(portfolioId);
