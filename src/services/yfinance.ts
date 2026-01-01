@@ -1,6 +1,6 @@
 // ============================================================================
-// YAHOO FINANCE SERVICE
-// Serviço para buscar cotações em tempo real
+// BRAPI.DEV SERVICE (API Brasileira de Cotações)
+// Serviço para buscar cotações em tempo real de ações brasileiras
 // ============================================================================
 
 export interface StockQuote {
@@ -12,40 +12,38 @@ export interface StockQuote {
 }
 
 export class YFinanceService {
-  private static readonly API_URL = 'https://query1.finance.yahoo.com/v8/finance/chart';
+  private static readonly API_URL = 'https://brapi.dev/api/quote';
   
   /**
    * Busca cotação de um único ticker
    */
   static async getQuote(ticker: string): Promise<StockQuote | null> {
     try {
-      // Adicionar sufixo .SA para ações brasileiras se não tiver
-      const symbol = ticker.toUpperCase().includes('.SA') ? ticker : `${ticker}.SA`;
+      // Remover sufixo .SA se tiver (Brapi não usa)
+      const symbol = ticker.toUpperCase().replace('.SA', '');
       
-      const response = await fetch(`${this.API_URL}/${symbol}?interval=1d&range=1d`);
+      const response = await fetch(`${this.API_URL}/${symbol}?range=1d&interval=1d`);
       
       if (!response.ok) {
-        console.error(`Yahoo Finance error for ${symbol}:`, response.status);
+        console.error(`Brapi error for ${symbol}:`, response.status);
         return null;
       }
       
       const data = await response.json();
-      const result = data.chart?.result?.[0];
+      const result = data.results?.[0];
       
       if (!result) return null;
       
-      const meta = result.meta;
-      const price = meta.regularMarketPrice || 0;
-      const previousClose = meta.chartPreviousClose || meta.previousClose || price;
-      const change = price - previousClose;
-      const changePercent = previousClose > 0 ? (change / previousClose) * 100 : 0;
+      const price = result.regularMarketPrice || 0;
+      const change = result.regularMarketChange || 0;
+      const changePercent = result.regularMarketChangePercent || 0;
       
       return {
-        symbol: ticker.toUpperCase(),
+        symbol: symbol,
         price,
         change,
         changePercent,
-        timestamp: new Date().toISOString()
+        timestamp: result.regularMarketTime || new Date().toISOString()
       };
     } catch (error) {
       console.error(`Error fetching quote for ${ticker}:`, error);
@@ -54,24 +52,43 @@ export class YFinanceService {
   }
   
   /**
-   * Busca cotações de múltiplos tickers
+   * Busca cotações de múltiplos tickers em uma única requisição
    */
   static async getQuotes(tickers: string[]): Promise<Map<string, StockQuote>> {
     const quotes = new Map<string, StockQuote>();
     
-    // Buscar em paralelo com limite de 5 por vez para não sobrecarregar
-    const batchSize = 5;
-    for (let i = 0; i < tickers.length; i += batchSize) {
-      const batch = tickers.slice(i, i + batchSize);
-      const results = await Promise.all(
-        batch.map(ticker => this.getQuote(ticker))
-      );
+    if (tickers.length === 0) return quotes;
+    
+    try {
+      // Remover sufixo .SA e juntar tickers com vírgula
+      const symbols = tickers.map(t => t.toUpperCase().replace('.SA', '')).join(',');
       
-      results.forEach((quote, index) => {
-        if (quote) {
-          quotes.set(batch[index].toUpperCase(), quote);
-        }
-      });
+      const response = await fetch(`${this.API_URL}/${symbols}?range=1d&interval=1d`);
+      
+      if (!response.ok) {
+        console.error(`Brapi error for multiple tickers:`, response.status);
+        return quotes;
+      }
+      
+      const data = await response.json();
+      const results = data.results || [];
+      
+      for (const result of results) {
+        const symbol = result.symbol;
+        const price = result.regularMarketPrice || 0;
+        const change = result.regularMarketChange || 0;
+        const changePercent = result.regularMarketChangePercent || 0;
+        
+        quotes.set(symbol, {
+          symbol,
+          price,
+          change,
+          changePercent,
+          timestamp: result.regularMarketTime || new Date().toISOString()
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching multiple quotes:', error);
     }
     
     return quotes;
