@@ -1,0 +1,219 @@
+export const DASHBOARD_HTML = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - YieldLab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-chart-line text-indigo-600 text-3xl mr-3"></i>
+                    <span class="text-2xl font-bold text-gray-900">YieldLab</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="userEmail" class="text-gray-700"></span>
+                    <button id="logoutBtn" class="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Sair
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
+                <p class="text-gray-600">Gerencie seus investimentos</p>
+            </div>
+            <button id="createPortfolioBtn" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition">
+                <i class="fas fa-plus mr-2"></i>Novo Portfólio
+            </button>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-medium text-gray-500">Total Investido</h3>
+                    <i class="fas fa-wallet text-2xl text-green-600"></i>
+                </div>
+                <p id="statTotalInvested" class="text-3xl font-bold text-gray-900">R$ 0,00</p>
+                <p class="text-sm text-gray-500 mt-2">
+                    <i class="fas fa-briefcase mr-1"></i>
+                    <span id="statPortfoliosCount">0</span> portfólios
+                </p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-medium text-gray-500">Rentabilidade</h3>
+                    <i class="fas fa-chart-line text-2xl text-blue-600"></i>
+                </div>
+                <p id="statProfitLoss" class="text-3xl font-bold text-gray-900">R$ 0,00</p>
+                <p class="text-sm font-semibold text-gray-500 mt-2">
+                    0% de retorno
+                </p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-medium text-gray-500">Dividendos</h3>
+                    <i class="fas fa-coins text-2xl text-yellow-600"></i>
+                </div>
+                <p class="text-3xl font-bold text-gray-900">R$ 0,00</p>
+                <p class="text-sm text-gray-500 mt-2">
+                    <i class="fas fa-calendar mr-1"></i>
+                    Este mês
+                </p>
+            </div>
+        </div>
+
+        <!-- Portfolios List -->
+        <div id="portfoliosList" class="mb-8">
+            <!-- Conteúdo carregado via JavaScript -->
+        </div>
+    </div>
+
+    <!-- Modal: Criar Portfólio -->
+    <div id="createPortfolioModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Novo Portfólio</h2>
+                <button data-modal-close="createPortfolioModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            
+            <form id="createPortfolioForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nome *</label>
+                    <input type="text" id="portfolioName" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                        placeholder="Ex: Minha Carteira de Ações">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Descrição</label>
+                    <textarea id="portfolioDescription" rows="3"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                        placeholder="Descrição opcional do portfólio"></textarea>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Moeda</label>
+                    <select id="portfolioCurrency"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                        <option value="BRL">BRL - Real Brasileiro</option>
+                        <option value="USD">USD - Dólar Americano</option>
+                        <option value="EUR">EUR - Euro</option>
+                    </select>
+                </div>
+                
+                <div class="flex space-x-4 pt-4">
+                    <button type="button" data-modal-close="createPortfolioModal"
+                        class="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        class="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700">
+                        <i class="fas fa-check mr-2"></i>Criar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Adicionar Ativo -->
+    <div id="addAssetModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Adicionar Ativo</h2>
+                <button data-modal-close="addAssetModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            
+            <form id="addAssetForm" class="space-y-4">
+                <input type="hidden" id="assetPortfolioId">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Ticker *</label>
+                    <input type="text" id="assetTicker" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                        placeholder="Ex: PETR4, BBDC4, ITSA4">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tipo *</label>
+                    <select id="assetType" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                        <option value="stock">Ação</option>
+                        <option value="fii">FII</option>
+                        <option value="etf">ETF</option>
+                        <option value="crypto">Cripto</option>
+                        <option value="other">Outro</option>
+                    </select>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Quantidade *</label>
+                        <input type="number" id="assetQuantity" required min="0" step="1"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                            placeholder="100">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Preço Médio *</label>
+                        <input type="number" id="assetPrice" required min="0" step="0.01"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                            placeholder="28.50">
+                    </div>
+                </div>
+                
+                <div class="flex space-x-4 pt-4">
+                    <button type="button" data-modal-close="addAssetModal"
+                        class="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        class="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700">
+                        <i class="fas fa-plus mr-2"></i>Adicionar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/js/firebase-config.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+    <script>
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                await window.authService.logout();
+                window.location.href = '/';
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        });
+
+        // Display user email
+        const user = window.authService?.getCurrentUser();
+        if (user) {
+            document.getElementById('userEmail').textContent = user.email;
+        }
+    </script>
+</body>
+</html>
+$`;

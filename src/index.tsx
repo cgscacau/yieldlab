@@ -6,6 +6,7 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { serveStatic } from 'hono/cloudflare-workers';
+import { DASHBOARD_HTML } from './dashboard-html';
 
 // Routes
 import portfolios from './routes/portfolios';
@@ -373,11 +374,10 @@ app.get('/login', (c) => {
 </html>`);
 });
 
-// Serve dashboard.html (será copiado para dist/ pelo vite)
-app.get('/dashboard.html', serveStatic({ root: './' }));
-
-// Redirect /dashboard para /dashboard.html
-app.get('/dashboard', (c) => c.redirect('/dashboard.html'));
+// Rota de Dashboard - retorna HTML inline
+app.get('/dashboard', (c) => {
+  return c.html(DASHBOARD_HTML);
+});
 
 // Dashboard antigo (backup)
 app.get('/dashboard-old', (c) => {
