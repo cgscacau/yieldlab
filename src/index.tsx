@@ -373,8 +373,16 @@ app.get('/login', (c) => {
 </html>`);
 });
 
-// Rota de Dashboard
+// Rota de Dashboard - redireciona para dashboard.html
 app.get('/dashboard', (c) => {
+  return c.redirect('/dashboard.html');
+});
+
+// Serve dashboard.html como static
+app.get('/dashboard.html', serveStatic({ path: './public/dashboard.html' }));
+
+// REMOVER O HTML INLINE ANTIGO - Dashboard agora é arquivo separado
+app.get('/dashboard-old', (c) => {
   return c.html(`<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
