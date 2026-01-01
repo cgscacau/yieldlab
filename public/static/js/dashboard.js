@@ -618,6 +618,12 @@ class DashboardManager {
 
       console.log('🚀 FORÇANDO atualização de cotações...');
 
+      // Verificar se há ativos
+      if (!this.assets || this.assets.length === 0) {
+        console.log('ℹ️ Nenhum ativo para atualizar');
+        return;
+      }
+
       // Buscar cotações direto da Brapi
       const tickers = this.assets.map(a => a.ticker).join(',');
       console.log('📊 Tickers:', tickers);
