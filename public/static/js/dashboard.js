@@ -336,105 +336,119 @@ class DashboardManager {
   }
 
   renderCharts() {
-    // Gráfico de Distribuição por Ativo
+    // Aguardar o DOM estar pronto
+    setTimeout(() => {
+      this.renderAssetChart();
+      this.renderTypeChart();
+    }, 100);
+  }
+
+  renderAssetChart() {
     const assetChartCanvas = document.getElementById('assetDistributionChart');
-    if (assetChartCanvas && this.assets.length > 0) {
-      const ctx = assetChartCanvas.getContext('2d');
-      
-      // Destruir gráfico anterior se existir
-      if (window.assetChart) window.assetChart.destroy();
-      
-      const data = this.assets.map(a => ({
-        label: a.ticker,
-        value: (a.averageCost || 0) * (a.quantity || 0)
-      }));
-      
-      window.assetChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: data.map(d => d.label),
-          datasets: [{
-            data: data.map(d => d.value),
-            backgroundColor: [
-              '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
-              '#EC4899', '#06B6D4', '#84CC16', '#F97316', '#6366F1'
-            ]
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'bottom'
-            },
-            tooltip: {
-              callbacks: {
-                label: (context) => {
-                  const value = context.parsed;
-                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                  const percent = ((value / total) * 100).toFixed(1);
-                  return `${context.label}: R$ ${this.formatMoney(value)} (${percent}%)`;
-                }
-              }
-            }
-          }
-        }
-      });
+    if (!assetChartCanvas || this.assets.length === 0) return;
+    
+    // Destruir gráfico anterior se existir
+    if (window.assetChart) {
+      window.assetChart.destroy();
+      window.assetChart = null;
     }
     
-    // Gráfico de Distribuição por Tipo
-    const typeChartCanvas = document.getElementById('typeDistributionChart');
-    if (typeChartCanvas && this.assets.length > 0) {
-      const ctx = typeChartCanvas.getContext('2d');
-      
-      // Destruir gráfico anterior se existir
-      if (window.typeChart) window.typeChart.destroy();
-      
-      const typeData = {};
-      this.assets.forEach(a => {
-        const value = (a.averageCost || 0) * (a.quantity || 0);
-        typeData[a.type] = (typeData[a.type] || 0) + value;
-      });
-      
-      const typeLabels = {
-        'stock': 'Ações',
-        'fii': 'FIIs',
-        'etf': 'ETFs',
-        'crypto': 'Criptos',
-        'other': 'Outros'
-      };
-      
-      window.typeChart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-          labels: Object.keys(typeData).map(k => typeLabels[k] || k),
-          datasets: [{
-            data: Object.values(typeData),
-            backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6']
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'bottom'
-            },
-            tooltip: {
-              callbacks: {
-                label: (context) => {
-                  const value = context.parsed;
-                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                  const percent = ((value / total) * 100).toFixed(1);
-                  return `${context.label}: R$ ${this.formatMoney(value)} (${percent}%)`;
-                }
+    const ctx = assetChartCanvas.getContext('2d');
+    const data = this.assets.map(a => ({
+      label: a.ticker,
+      value: (a.averageCost || 0) * (a.quantity || 0)
+    }));
+    
+    window.assetChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: data.map(d => d.label),
+        datasets: [{
+          data: data.map(d => d.value),
+          backgroundColor: [
+            '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
+            '#EC4899', '#06B6D4', '#84CC16', '#F97316', '#6366F1'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        aspectRatio: 2,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const value = context.parsed;
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percent = ((value / total) * 100).toFixed(1);
+                return `${context.label}: R$ ${this.formatMoney(value)} (${percent}%)`;
               }
             }
           }
         }
-      });
+      }
+    });
+  }
+    
+  renderTypeChart() {
+    const typeChartCanvas = document.getElementById('typeDistributionChart');
+    if (!typeChartCanvas || this.assets.length === 0) return;
+    
+    // Destruir gráfico anterior se existir
+    if (window.typeChart) {
+      window.typeChart.destroy();
+      window.typeChart = null;
     }
+    
+    const ctx = typeChartCanvas.getContext('2d');
+    const typeData = {};
+    this.assets.forEach(a => {
+      const value = (a.averageCost || 0) * (a.quantity || 0);
+      typeData[a.type] = (typeData[a.type] || 0) + value;
+    });
+    
+    const typeLabels = {
+      'stock': 'Ações',
+      'fii': 'FIIs',
+      'etf': 'ETFs',
+      'crypto': 'Criptos',
+      'other': 'Outros'
+    };
+    
+    window.typeChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: Object.keys(typeData).map(k => typeLabels[k] || k),
+        datasets: [{
+          data: Object.values(typeData),
+          backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        aspectRatio: 2,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const value = context.parsed;
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percent = ((value / total) * 100).toFixed(1);
+                return `${context.label}: R$ ${this.formatMoney(value)} (${percent}%)`;
+              }
+            }
+          }
+        }
+      }
+    });
   }
 
   // ============================================================================
@@ -535,9 +549,22 @@ class DashboardManager {
     const modal = document.getElementById(modalId);
     if (modal) {
       modal.classList.add('hidden');
+      
       // Reset form
       const form = modal.querySelector('form');
       if (form) form.reset();
+      
+      // Destruir gráficos ao fechar modal de detalhes
+      if (modalId === 'portfolioDetailsModal') {
+        if (window.assetChart) {
+          window.assetChart.destroy();
+          window.assetChart = null;
+        }
+        if (window.typeChart) {
+          window.typeChart.destroy();
+          window.typeChart = null;
+        }
+      }
     }
   }
 
