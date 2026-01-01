@@ -545,6 +545,44 @@ class DashboardManager {
     }
   }
 
+  async updateQuotes() {
+    if (!this.selectedPortfolio) return;
+    
+    try {
+      const token = window.authService.getToken();
+      const portfolioId = this.selectedPortfolio.id;
+      
+      this.showNotification('Atualizando cotações...', 'info');
+      console.log('🔄 Atualizando cotações do portfólio:', portfolioId);
+      
+      const response = await fetch(`/api/quotes/update-portfolio/${portfolioId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) throw new Error('Erro ao atualizar cotações');
+
+      const result = await response.json();
+      
+      if (result.updated > 0) {
+        this.showNotification(`${result.updated} cotação(ões) atualizada(s)!`, 'success');
+        console.log('✅ Cotações atualizadas:', result.updates);
+        
+        // Recarregar ativos e atualizar interface
+        await this.loadAssets(portfolioId);
+        await this.loadPortfolios();
+        this.showPortfolioDetails();
+      } else {
+        this.showNotification('Nenhuma cotação atualizada', 'info');
+      }
+    } catch (error) {
+      console.error('❌ Erro ao atualizar cotações:', error);
+      this.showNotification('Erro ao atualizar cotações', 'error');
+    }
+  }
+
   closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {

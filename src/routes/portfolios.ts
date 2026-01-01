@@ -24,9 +24,36 @@ portfolios.get('/', async (c) => {
     const firestore = new FirestoreService(token, projectId);
     const userPortfolios = await firestore.getPortfoliosByUserId(user.uid);
 
+    // Calcular valores de cada portfólio
+    const portfoliosWithMetrics = await Promise.all(
+      userPortfolios.map(async (portfolio) => {
+        const assets = await firestore.getAssetsByPortfolioId(portfolio.id);
+        
+        const totalInvested = assets.reduce((sum, a) => 
+          sum + ((a.averageCost || 0) * (a.quantity || 0)), 0
+        );
+        
+        const totalValue = assets.reduce((sum, a) => 
+          sum + ((a.currentPrice || a.averageCost || 0) * (a.quantity || 0)), 0
+        );
+        
+        const profitLoss = totalValue - totalInvested;
+        const profitLossPercent = totalInvested > 0 ? (profitLoss / totalInvested) * 100 : 0;
+        
+        return {
+          ...portfolio,
+          totalInvested,
+          totalValue,
+          profitLoss,
+          profitLossPercent,
+          assetsCount: assets.length
+        };
+      })
+    );
+
     return c.json({
       success: true,
-      data: userPortfolios
+      data: portfoliosWithMetrics
     });
   } catch (error: any) {
     console.error('Error fetching portfolios:', error);

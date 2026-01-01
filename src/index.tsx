@@ -13,6 +13,7 @@ import portfolios from './routes/portfolios';
 import assets from './routes/assets';
 import transactions from './routes/transactions';
 import dividends from './routes/dividends';
+import quotes from './routes/quotes';
 
 // Types
 import type { Portfolio, Asset, Transaction, Dividend } from './types';
@@ -44,6 +45,7 @@ app.route('/api/portfolios', portfolios);
 app.route('/api/assets', assets);
 app.route('/api/transactions', transactions);
 app.route('/api/dividends', dividends);
+app.route('/api/quotes', quotes);
 
 // ============================================================================
 // ANALYTICS & METRICS
