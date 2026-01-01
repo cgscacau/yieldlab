@@ -359,13 +359,17 @@ class DashboardManager {
     if (addAssetForm) {
       addAssetForm.addEventListener('submit', (e) => {
         e.preventDefault();
+        const ticker = document.getElementById('assetTicker').value.toUpperCase();
         const data = {
           portfolioId: document.getElementById('assetPortfolioId').value,
-          ticker: document.getElementById('assetTicker').value.toUpperCase(),
+          ticker: ticker,
+          name: ticker, // Nome do ativo (obrigatório)
           type: document.getElementById('assetType').value,
-          quantity: parseFloat(document.getElementById('assetQuantity').value),
-          averagePrice: parseFloat(document.getElementById('assetPrice').value)
+          quantity: parseFloat(document.getElementById('assetQuantity').value) || 0,
+          averageCost: parseFloat(document.getElementById('assetPrice').value) || 0,
+          currentPrice: parseFloat(document.getElementById('assetPrice').value) || 0
         };
+        console.log('📤 Enviando dados do ativo:', data);
         this.addAsset(data);
       });
     }
