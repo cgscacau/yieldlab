@@ -373,6 +373,173 @@ app.get('/login', (c) => {
 </html>`);
 });
 
+// Rota de Dashboard
+app.get('/dashboard', (c) => {
+  return c.html(`<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - YieldLab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-chart-line text-indigo-600 text-3xl mr-3"></i>
+                    <span class="text-2xl font-bold text-gray-900">YieldLab</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="userEmail" class="text-gray-700"></span>
+                    <button id="logoutBtn" class="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Sair
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
+            <p class="text-gray-600">Bem-vindo ao YieldLab - Sistema de Gestão de Investimentos</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Card 1 -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-medium text-gray-500">Total Investido</h3>
+                    <i class="fas fa-wallet text-2xl text-green-600"></i>
+                </div>
+                <p class="text-3xl font-bold text-gray-900">R$ 0,00</p>
+                <p class="text-sm text-gray-500 mt-2">
+                    <i class="fas fa-arrow-up text-green-500 mr-1"></i>
+                    0% vs. mês passado
+                </p>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-medium text-gray-500">Rentabilidade</h3>
+                    <i class="fas fa-chart-line text-2xl text-blue-600"></i>
+                </div>
+                <p class="text-3xl font-bold text-gray-900">R$ 0,00</p>
+                <p class="text-sm text-gray-500 mt-2">
+                    <i class="fas fa-minus text-gray-500 mr-1"></i>
+                    0% de retorno
+                </p>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-medium text-gray-500">Dividendos</h3>
+                    <i class="fas fa-coins text-2xl text-yellow-600"></i>
+                </div>
+                <p class="text-3xl font-bold text-gray-900">R$ 0,00</p>
+                <p class="text-sm text-gray-500 mt-2">
+                    <i class="fas fa-calendar mr-1"></i>
+                    Este mês
+                </p>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Ações Rápidas</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <button class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition">
+                    <i class="fas fa-plus-circle text-3xl text-indigo-600 mb-2"></i>
+                    <span class="text-sm font-medium text-gray-700">Novo Portfólio</span>
+                </button>
+                <button class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition">
+                    <i class="fas fa-chart-pie text-3xl text-green-600 mb-2"></i>
+                    <span class="text-sm font-medium text-gray-700">Adicionar Ativo</span>
+                </button>
+                <button class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition">
+                    <i class="fas fa-exchange-alt text-3xl text-blue-600 mb-2"></i>
+                    <span class="text-sm font-medium text-gray-700">Transação</span>
+                </button>
+                <button class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition">
+                    <i class="fas fa-file-csv text-3xl text-purple-600 mb-2"></i>
+                    <span class="text-sm font-medium text-gray-700">Importar CSV</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="bg-white rounded-lg shadow p-12 text-center">
+            <i class="fas fa-briefcase text-6xl text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Nenhum portfólio criado</h3>
+            <p class="text-gray-600 mb-6">Comece criando seu primeiro portfólio de investimentos</p>
+            <button class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition">
+                <i class="fas fa-plus mr-2"></i>
+                Criar Primeiro Portfólio
+            </button>
+        </div>
+
+        <!-- Info Box -->
+        <div class="mt-8 bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+            <div class="flex items-start">
+                <i class="fas fa-info-circle text-blue-500 text-xl mr-3 mt-1"></i>
+                <div>
+                    <h4 class="font-semibold text-blue-900 mb-1">Dashboard em Desenvolvimento</h4>
+                    <p class="text-sm text-blue-800">
+                        Esta é a versão inicial do dashboard. Em breve teremos gráficos, relatórios detalhados e mais funcionalidades!
+                    </p>
+                    <p class="text-sm text-blue-800 mt-2">
+                        <strong>API REST disponível:</strong> Você já pode usar todos os endpoints da API para gerenciar seus investimentos.
+                        <a href="/api/health" class="underline ml-1">Testar API</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/js/firebase-config.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if user is logged in
+            if (!window.authService || !window.authService.isAuthenticated()) {
+                window.location.href = '/login';
+                return;
+            }
+
+            // Display user email
+            const user = window.authService.getCurrentUser();
+            if (user) {
+                document.getElementById('userEmail').textContent = user.email;
+            }
+
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', async () => {
+                try {
+                    await window.authService.logout();
+                    window.location.href = '/';
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    alert('Erro ao fazer logout');
+                }
+            });
+
+            console.log('✅ Dashboard carregado');
+            console.log('Usuario:', user);
+        });
+    </script>
+</body>
+</html>`);
+});
+
 app.get('/', (c) => {
   return c.html(`
     <!DOCTYPE html>
