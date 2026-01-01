@@ -328,6 +328,23 @@ class DashboardManager {
         'other': 'Outro'
       };
       
+      // Calcular dias de posse
+      let daysHeld = '-';
+      let purchaseDateFormatted = '-';
+      if (asset.purchaseDate) {
+        const purchaseDate = new Date(asset.purchaseDate);
+        const today = new Date();
+        const diffTime = Math.abs(today - purchaseDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        daysHeld = `${diffDays} dia${diffDays !== 1 ? 's' : ''}`;
+        
+        // Formatar data para exibição (DD/MM/YYYY)
+        const day = String(purchaseDate.getDate()).padStart(2, '0');
+        const month = String(purchaseDate.getMonth() + 1).padStart(2, '0');
+        const year = purchaseDate.getFullYear();
+        purchaseDateFormatted = `${day}/${month}/${year}`;
+      }
+      
       return `
         <tr class="hover:bg-gray-50">
           <td class="px-6 py-4 whitespace-nowrap">
@@ -348,6 +365,12 @@ class DashboardManager {
           </td>
           <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-gray-900">
             R$ ${this.formatMoney(totalValue)}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+            <div class="text-center">
+              <div>${purchaseDateFormatted}</div>
+              <div class="text-xs text-gray-500">${daysHeld}</div>
+            </div>
           </td>
           <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
             <button onclick="dashboard.openEditAssetModal('${asset.id}')" class="text-blue-600 hover:text-blue-900 mr-3">
@@ -514,6 +537,12 @@ class DashboardManager {
     document.getElementById('editAssetType').value = asset.type;
     document.getElementById('editAssetQuantity').value = asset.quantity || 0;
     document.getElementById('editAssetPrice').value = asset.averageCost || 0;
+    
+    // Preencher data de compra (formato YYYY-MM-DD para input type="date")
+    if (asset.purchaseDate) {
+      const date = asset.purchaseDate.split('T')[0]; // Remove hora se houver
+      document.getElementById('editAssetPurchaseDate').value = date;
+    }
     
     modal.classList.remove('hidden');
     document.getElementById('editAssetQuantity').focus();
@@ -769,7 +798,8 @@ class DashboardManager {
           type: document.getElementById('assetType').value,
           quantity: parseFloat(document.getElementById('assetQuantity').value) || 0,
           averageCost: parseFloat(document.getElementById('assetPrice').value) || 0,
-          currentPrice: parseFloat(document.getElementById('assetPrice').value) || 0
+          currentPrice: parseFloat(document.getElementById('assetPrice').value) || 0,
+          purchaseDate: document.getElementById('assetPurchaseDate').value
         };
         console.log('📤 Enviando dados do ativo:', data);
         this.addAsset(data);
@@ -787,7 +817,8 @@ class DashboardManager {
           type: document.getElementById('editAssetType').value,
           quantity: parseFloat(document.getElementById('editAssetQuantity').value) || 0,
           averageCost: parseFloat(document.getElementById('editAssetPrice').value) || 0,
-          currentPrice: parseFloat(document.getElementById('editAssetPrice').value) || 0
+          currentPrice: parseFloat(document.getElementById('editAssetPrice').value) || 0,
+          purchaseDate: document.getElementById('editAssetPurchaseDate').value
         };
         console.log('📤 Atualizando ativo:', assetId, data);
         this.updateAsset(assetId, data);

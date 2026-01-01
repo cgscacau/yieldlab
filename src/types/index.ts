@@ -30,6 +30,7 @@ export interface Asset {
   quantity: number;
   averageCost: number;
   currentPrice: number;
+  purchaseDate?: string; // Data de compra do ativo
   sector?: string;
   createdAt: string;
   updatedAt: string;

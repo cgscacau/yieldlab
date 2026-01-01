@@ -57,7 +57,7 @@ assets.post('/', async (c) => {
     const projectId = c.env?.FIREBASE_PROJECT_ID || 'yieldlab-76d87';
     const body = await c.req.json();
 
-    const { portfolioId, ticker, name, type, quantity, averageCost, currentPrice, sector } = body;
+    const { portfolioId, ticker, name, type, quantity, averageCost, currentPrice, sector, purchaseDate } = body;
 
     if (!portfolioId || !ticker || !name || !type) {
       return c.json({
@@ -87,6 +87,7 @@ assets.post('/', async (c) => {
       averageCost: averageCost || 0,
       currentPrice: currentPrice || 0,
       sector: sector || 'Outros',
+      purchaseDate: purchaseDate || new Date().toISOString(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
