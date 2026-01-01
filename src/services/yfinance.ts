@@ -79,13 +79,16 @@ export class YFinanceService {
         const change = result.regularMarketChange || 0;
         const changePercent = result.regularMarketChangePercent || 0;
         
-        quotes.set(symbol, {
+        const quote = {
           symbol,
           price,
           change,
           changePercent,
           timestamp: result.regularMarketTime || new Date().toISOString()
-        });
+        };
+        
+        quotes.set(symbol, quote);
+        console.log(`💰 Quote recebida: ${symbol} = R$ ${price}`);
       }
     } catch (error) {
       console.error('Error fetching multiple quotes:', error);
