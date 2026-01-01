@@ -22,6 +22,10 @@ class DashboardManager {
 
     // Carregar dados iniciais
     await this.loadPortfolios();
+    
+    // Atualizar cotações de todos os portfólios ao carregar
+    await this.updateAllQuotes();
+    
     this.setupEventListeners();
   }
 
@@ -580,6 +584,44 @@ class DashboardManager {
     } catch (error) {
       console.error('❌ Erro ao atualizar cotações:', error);
       this.showNotification('Erro ao atualizar cotações', 'error');
+    }
+  }
+
+  async updateAllQuotes() {
+    if (this.portfolios.length === 0) return;
+    
+    try {
+      const token = window.authService.getToken();
+      console.log('🔄 Atualizando cotações de todos os portfólios...');
+      
+      let totalUpdated = 0;
+      
+      for (const portfolio of this.portfolios) {
+        try {
+          const response = await fetch(`/api/quotes/update-portfolio/${portfolio.id}`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            totalUpdated += result.updated || 0;
+            console.log(`✅ Portfólio ${portfolio.name}: ${result.updated} cotação(ões) atualizada(s)`);
+          }
+        } catch (error) {
+          console.warn(`⚠️ Erro ao atualizar portfólio ${portfolio.name}:`, error);
+        }
+      }
+      
+      if (totalUpdated > 0) {
+        console.log(`✅ Total: ${totalUpdated} cotação(ões) atualizada(s)`);
+        // Recarregar portfólios para pegar valores atualizados
+        await this.loadPortfolios();
+      }
+    } catch (error) {
+      console.error('❌ Erro ao atualizar cotações:', error);
     }
   }
 
