@@ -56,18 +56,31 @@ function fromFirestoreDocument(doc: FirestoreDocument): any {
   const data: Record<string, any> = {};
   
   for (const [key, value] of Object.entries(doc.fields)) {
-    if ('stringValue' in value) data[key] = value.stringValue;
-    else if ('doubleValue' in value) data[key] = value.doubleValue;
-    else if ('integerValue' in value) data[key] = parseInt(value.integerValue);
-    else if ('booleanValue' in value) data[key] = value.booleanValue;
-    else if ('arrayValue' in value) {
+    if ('stringValue' in value) {
+      data[key] = value.stringValue;
+    } else if ('doubleValue' in value) {
+      data[key] = value.doubleValue;
+    } else if ('integerValue' in value) {
+      data[key] = parseInt(value.integerValue);
+    } else if ('booleanValue' in value) {
+      data[key] = value.booleanValue;
+    } else if ('arrayValue' in value) {
       data[key] = value.arrayValue.values?.map((v: any) => v.stringValue || v.doubleValue) || [];
+    } else if ('nullValue' in value) {
+      data[key] = null;
+    } else {
+      // Log campos não reconhecidos para debug
+      console.warn(`Campo Firestore não reconhecido: ${key}`, value);
+      data[key] = undefined;
     }
   }
   
   // Extrai ID do documento
   const pathParts = doc.name.split('/');
   data.id = pathParts[pathParts.length - 1];
+  
+  // Log para debug
+  console.log('Documento Firestore convertido:', { id: data.id, ticker: data.ticker, name: data.name });
   
   return data;
 }

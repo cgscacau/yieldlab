@@ -231,7 +231,8 @@ class DashboardManager {
       const data = await response.json();
       this.assets = data.data || data.assets || [];
       
-      console.log('✅ Ativos carregados:', this.assets.length, this.assets);
+      console.log('✅ Ativos carregados:', this.assets.length);
+      console.log('📦 Dados dos ativos:', JSON.stringify(this.assets, null, 2));
     } catch (error) {
       console.error('❌ Erro ao carregar ativos:', error);
       this.showNotification('Erro ao carregar ativos', 'error');
@@ -349,7 +350,7 @@ class DashboardManager {
         <tr class="hover:bg-gray-50">
           <td class="px-6 py-4 whitespace-nowrap">
             <div class="flex items-center">
-              <span class="text-sm font-bold text-gray-900">${asset.ticker}</span>
+              <span class="text-sm font-bold text-gray-900">${asset.ticker || asset.name || 'N/A'}</span>
             </div>
           </td>
           <td class="px-6 py-4 whitespace-nowrap">

@@ -33,6 +33,11 @@ assets.get('/:portfolioId', async (c) => {
     }
 
     const portfolioAssets = await firestore.getAssetsByPortfolioId(portfolioId);
+    
+    // Log para debug
+    console.log(`📊 Assets retornados (${portfolioAssets.length}):`, 
+      portfolioAssets.map(a => ({ id: a.id, ticker: a.ticker, name: a.name }))
+    );
 
     return c.json({
       success: true,
