@@ -46,7 +46,7 @@ export const DASHBOARD_HTML = `<!DOCTYPE html>
                     <h3 class="text-sm font-medium text-gray-500">Total Investido</h3>
                     <i class="fas fa-wallet text-2xl text-green-600"></i>
                 </div>
-                <p id="statTotalInvested" class="text-3xl font-bold text-gray-900">R\$ 0,00</p>
+                <p id="statTotalInvested" class="text-3xl font-bold text-gray-900">R$ 0,00</p>
                 <p class="text-sm text-gray-500 mt-2">
                     <i class="fas fa-briefcase mr-1"></i>
                     <span id="statPortfoliosCount">0</span> portfólios
@@ -58,7 +58,7 @@ export const DASHBOARD_HTML = `<!DOCTYPE html>
                     <h3 class="text-sm font-medium text-gray-500">Rentabilidade</h3>
                     <i class="fas fa-chart-line text-2xl text-blue-600"></i>
                 </div>
-                <p id="statProfitLoss" class="text-3xl font-bold text-gray-900">R\$ 0,00</p>
+                <p id="statProfitLoss" class="text-3xl font-bold text-gray-900">R$ 0,00</p>
                 <p class="text-sm font-semibold text-gray-500 mt-2">
                     0% de retorno
                 </p>
@@ -69,7 +69,7 @@ export const DASHBOARD_HTML = `<!DOCTYPE html>
                     <h3 class="text-sm font-medium text-gray-500">Dividendos</h3>
                     <i class="fas fa-coins text-2xl text-yellow-600"></i>
                 </div>
-                <p class="text-3xl font-bold text-gray-900">R\$ 0,00</p>
+                <p class="text-3xl font-bold text-gray-900">R$ 0,00</p>
                 <p class="text-sm text-gray-500 mt-2">
                     <i class="fas fa-calendar mr-1"></i>
                     Este mês
@@ -149,15 +149,15 @@ export const DASHBOARD_HTML = `<!DOCTYPE html>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                 <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4">
                     <p class="text-sm text-blue-600 font-medium">Valor Total</p>
-                    <p id="portfolioDetailsTotalValue" class="text-2xl font-bold text-blue-900">R\$ 0,00</p>
+                    <p id="portfolioDetailsTotalValue" class="text-2xl font-bold text-blue-900">R$ 0,00</p>
                 </div>
                 <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4">
                     <p class="text-sm text-green-600 font-medium">Investido</p>
-                    <p id="portfolioDetailsInvested" class="text-2xl font-bold text-green-900">R\$ 0,00</p>
+                    <p id="portfolioDetailsInvested" class="text-2xl font-bold text-green-900">R$ 0,00</p>
                 </div>
                 <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4">
                     <p class="text-sm text-purple-600 font-medium">Rentabilidade</p>
-                    <p id="portfolioDetailsProfitLoss" class="text-2xl font-bold text-purple-900">R\$ 0,00</p>
+                    <p id="portfolioDetailsProfitLoss" class="text-2xl font-bold text-purple-900">R$ 0,00</p>
                 </div>
                 <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg p-4">
                     <p class="text-sm text-yellow-600 font-medium">Ativos</p>
@@ -358,4 +358,5 @@ export const DASHBOARD_HTML = `<!DOCTYPE html>
         }
     </script>
 </body>
-</html>`;
+</html>
+`;
