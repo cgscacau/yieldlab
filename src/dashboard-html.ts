@@ -6,6 +6,7 @@ export const DASHBOARD_HTML = `<!DOCTYPE html>
     <title>Dashboard - YieldLab</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Navbar -->
@@ -45,7 +46,7 @@ export const DASHBOARD_HTML = `<!DOCTYPE html>
                     <h3 class="text-sm font-medium text-gray-500">Total Investido</h3>
                     <i class="fas fa-wallet text-2xl text-green-600"></i>
                 </div>
-                <p id="statTotalInvested" class="text-3xl font-bold text-gray-900">R$ 0,00</p>
+                <p id="statTotalInvested" class="text-3xl font-bold text-gray-900">R\$ 0,00</p>
                 <p class="text-sm text-gray-500 mt-2">
                     <i class="fas fa-briefcase mr-1"></i>
                     <span id="statPortfoliosCount">0</span> portfólios
@@ -57,7 +58,7 @@ export const DASHBOARD_HTML = `<!DOCTYPE html>
                     <h3 class="text-sm font-medium text-gray-500">Rentabilidade</h3>
                     <i class="fas fa-chart-line text-2xl text-blue-600"></i>
                 </div>
-                <p id="statProfitLoss" class="text-3xl font-bold text-gray-900">R$ 0,00</p>
+                <p id="statProfitLoss" class="text-3xl font-bold text-gray-900">R\$ 0,00</p>
                 <p class="text-sm font-semibold text-gray-500 mt-2">
                     0% de retorno
                 </p>
@@ -68,7 +69,7 @@ export const DASHBOARD_HTML = `<!DOCTYPE html>
                     <h3 class="text-sm font-medium text-gray-500">Dividendos</h3>
                     <i class="fas fa-coins text-2xl text-yellow-600"></i>
                 </div>
-                <p class="text-3xl font-bold text-gray-900">R$ 0,00</p>
+                <p class="text-3xl font-bold text-gray-900">R\$ 0,00</p>
                 <p class="text-sm text-gray-500 mt-2">
                     <i class="fas fa-calendar mr-1"></i>
                     Este mês
@@ -128,6 +129,87 @@ export const DASHBOARD_HTML = `<!DOCTYPE html>
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal: Detalhes do Portfólio -->
+    <div id="portfolioDetailsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto">
+        <div class="bg-white rounded-lg shadow-2xl p-8 max-w-6xl w-full mx-4 my-8">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 id="portfolioDetailsTitle" class="text-3xl font-bold text-gray-900">Portfólio</h2>
+                    <p id="portfolioDetailsDescription" class="text-gray-600 mt-1"></p>
+                </div>
+                <button data-modal-close="portfolioDetailsModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            
+            <!-- Portfolio Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4">
+                    <p class="text-sm text-blue-600 font-medium">Valor Total</p>
+                    <p id="portfolioDetailsTotalValue" class="text-2xl font-bold text-blue-900">R\$ 0,00</p>
+                </div>
+                <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4">
+                    <p class="text-sm text-green-600 font-medium">Investido</p>
+                    <p id="portfolioDetailsInvested" class="text-2xl font-bold text-green-900">R\$ 0,00</p>
+                </div>
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4">
+                    <p class="text-sm text-purple-600 font-medium">Rentabilidade</p>
+                    <p id="portfolioDetailsProfitLoss" class="text-2xl font-bold text-purple-900">R\$ 0,00</p>
+                </div>
+                <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg p-4">
+                    <p class="text-sm text-yellow-600 font-medium">Ativos</p>
+                    <p id="portfolioDetailsAssetsCount" class="text-2xl font-bold text-yellow-900">0</p>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-white border border-gray-200 rounded-lg p-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Distribuição por Ativo</h3>
+                    <canvas id="assetDistributionChart" height="200"></canvas>
+                </div>
+                <div class="bg-white border border-gray-200 rounded-lg p-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Distribuição por Tipo</h3>
+                    <canvas id="typeDistributionChart" height="200"></canvas>
+                </div>
+            </div>
+            
+            <!-- Assets Table -->
+            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-gray-900">Ativos</h3>
+                    <button onclick="dashboard.openAddAssetModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 text-sm">
+                        <i class="fas fa-plus mr-2"></i>Adicionar Ativo
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ticker</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Quantidade</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Preço Médio</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Valor Total</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="assetsTableBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Conteúdo carregado via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="emptyAssetsMessage" class="hidden px-6 py-12 text-center">
+                    <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-600 text-lg mb-4">Nenhum ativo cadastrado</p>
+                    <button onclick="dashboard.openAddAssetModal()" class="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700">
+                        <i class="fas fa-plus mr-2"></i>Adicionar Primeiro Ativo
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -193,6 +275,67 @@ export const DASHBOARD_HTML = `<!DOCTYPE html>
         </div>
     </div>
 
+    <!-- Modal: Editar Ativo -->
+    <div id="editAssetModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Editar Ativo</h2>
+                <button data-modal-close="editAssetModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            
+            <form id="editAssetForm" class="space-y-4">
+                <input type="hidden" id="editAssetId">
+                <input type="hidden" id="editAssetPortfolioId">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Ticker *</label>
+                    <input type="text" id="editAssetTicker" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-gray-100"
+                        readonly>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tipo *</label>
+                    <select id="editAssetType" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                        <option value="stock">Ação</option>
+                        <option value="fii">FII</option>
+                        <option value="etf">ETF</option>
+                        <option value="crypto">Cripto</option>
+                        <option value="other">Outro</option>
+                    </select>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Quantidade *</label>
+                        <input type="number" id="editAssetQuantity" required min="0" step="1"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Preço Médio *</label>
+                        <input type="number" id="editAssetPrice" required min="0" step="0.01"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+                
+                <div class="flex space-x-4 pt-4">
+                    <button type="button" data-modal-close="editAssetModal"
+                        class="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700">
+                        <i class="fas fa-save mr-2"></i>Salvar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="/static/js/firebase-config.js"></script>
     <script src="/static/js/auth.js"></script>
@@ -215,5 +358,4 @@ export const DASHBOARD_HTML = `<!DOCTYPE html>
         }
     </script>
 </body>
-</html>
-$`;
+</html>`;
