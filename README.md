@@ -529,3 +529,4 @@ Sistema desenvolvido com Hono + Firebase + Cloudflare Pages.
 **⭐ Se gostou, dê uma estrela no GitHub!**
 
 **📧 Dúvidas? Abra uma issue!**
+# Trigger rebuild
