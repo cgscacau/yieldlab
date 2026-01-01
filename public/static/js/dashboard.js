@@ -155,6 +155,11 @@ class DashboardManager {
     if (!this.selectedPortfolio) return;
 
     await this.loadAssets(portfolioId);
+    
+    // ATUALIZAR COTAÇÕES AUTOMATICAMENTE AO ABRIR PORTFÓLIO
+    console.log('🔄 Auto-atualizando cotações...');
+    await this.forceUpdateQuotes(portfolioId);
+    
     this.showPortfolioDetails();
   }
 
@@ -602,7 +607,77 @@ class DashboardManager {
     }
   }
 
+  // FORÇA ATUALIZAÇÃO DE COTAÇÕES DIRETO NO FIRESTORE
+  async forceUpdateQuotes(portfolioId) {
+    try {
+      const token = window.authService.getToken();
+      if (!token) {
+        console.error('❌ Token ausente!');
+        return;
+      }
+
+      console.log('🚀 FORÇANDO atualização de cotações...');
+
+      // Buscar cotações direto da Brapi
+      const tickers = this.assets.map(a => a.ticker).join(',');
+      console.log('📊 Tickers:', tickers);
+
+      const brapiResponse = await fetch(`https://brapi.dev/api/quote/${tickers}?token=neCCcmX2AynTnvLpiH25TY`);
+      const brapiData = await brapiResponse.json();
+      
+      console.log('📈 Dados Brapi:', brapiData.results);
+
+      // Atualizar cada ativo diretamente
+      let updated = 0;
+      for (const asset of this.assets) {
+        const quote = brapiData.results.find(q => q.symbol === asset.ticker);
+        if (quote && quote.regularMarketPrice > 0) {
+          const newPrice = quote.regularMarketPrice;
+          console.log(`💰 ${asset.ticker}: R$ ${asset.currentPrice || asset.averageCost} → R$ ${newPrice}`);
+
+          // Atualizar no backend
+          const updateResponse = await fetch(`/api/assets/${asset.id}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              portfolioId: portfolioId,
+              currentPrice: newPrice
+            })
+          });
+
+          if (updateResponse.ok) {
+            updated++;
+            console.log(`✅ ${asset.ticker} atualizado!`);
+          }
+        }
+      }
+
+      console.log(`✅ ${updated} cotação(ões) atualizada(s)!`);
+      
+      // Recarregar dados
+      await this.loadAssets(portfolioId);
+      await this.loadPortfolios();
+
+    } catch (error) {
+      console.error('❌ Erro ao forçar atualização:', error);
+    }
+  }
+
   async updateQuotes() {
+    if (!this.selectedPortfolio) {
+      console.warn('⚠️ Nenhum portfólio selecionado');
+      return;
+    }
+    
+    await this.forceUpdateQuotes(this.selectedPortfolio.id);
+    this.showPortfolioDetails();
+  }
+
+  // MÉTODO ANTIGO (BACKUP)
+  async updateQuotesOld() {
     if (!this.selectedPortfolio) {
       console.warn('⚠️ Nenhum portfólio selecionado');
       return;
