@@ -188,18 +188,23 @@ class DashboardManager {
   async loadAssets(portfolioId) {
     try {
       const token = window.authService.getToken();
-      const response = await fetch(`/api/assets?portfolioId=${portfolioId}`, {
+      console.log('📡 Carregando ativos do portfólio:', portfolioId);
+      
+      const response = await fetch(`/api/assets/${portfolioId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
-      if (!response.ok) throw new Error('Erro ao carregar ativos');
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Erro ao carregar ativos');
+      }
 
       const data = await response.json();
       this.assets = data.data || data.assets || [];
       
-      console.log('✅ Ativos carregados:', this.assets.length);
+      console.log('✅ Ativos carregados:', this.assets.length, this.assets);
     } catch (error) {
       console.error('❌ Erro ao carregar ativos:', error);
       this.showNotification('Erro ao carregar ativos', 'error');
@@ -233,9 +238,18 @@ class DashboardManager {
   }
 
   showPortfolioDetails() {
-    // TODO: Implementar modal/página de detalhes do portfólio com lista de ativos
     console.log('📊 Mostrando detalhes do portfólio:', this.selectedPortfolio);
     console.log('📈 Ativos:', this.assets);
+    
+    // Exibir alerta temporário com os ativos
+    if (this.assets.length === 0) {
+      this.showNotification(`Portfólio "${this.selectedPortfolio.name}" não possui ativos ainda`, 'info');
+    } else {
+      const assetsList = this.assets.map(a => 
+        `${a.ticker}: ${a.quantity} unidades @ R$ ${this.formatMoney(a.averageCost || 0)}`
+      ).join('\n');
+      alert(`📊 Ativos do portfólio "${this.selectedPortfolio.name}":\n\n${assetsList}`);
+    }
   }
 
   // ============================================================================
