@@ -736,32 +736,14 @@ class DashboardManager {
     if (this.portfolios.length === 0) return;
     
     try {
-      const token = window.authService.getToken();
       console.log('🔄 Atualizando cotações de todos os portfólios...');
       
-      let totalUpdated = 0;
-      
-      for (const portfolio of this.portfolios) {
-        try {
-          const response = await fetch(`/api/quotes/update-portfolio/${portfolio.id}`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-
-          if (response.ok) {
-            const result = await response.json();
-            totalUpdated += result.updated || 0;
-            console.log(`✅ Portfólio ${portfolio.name}: ${result.updated} cotação(ões) atualizada(s)`);
-          }
-        } catch (error) {
-          console.warn(`⚠️ Erro ao atualizar portfólio ${portfolio.name}:`, error);
-        }
-      }
-      
-      if (totalUpdated > 0) {
-        console.log(`✅ Total: ${totalUpdated} cotação(ões) atualizada(s)`);
+      // Se houver um portfólio selecionado e com ativos, atualiza suas cotações
+      if (this.selectedPortfolio && this.assets && this.assets.length > 0) {
+        await this.forceUpdateQuotes(this.selectedPortfolio.id);
+        console.log(`✅ Portfólio ${this.selectedPortfolio.name}: cotações atualizadas`);
+      } else {
+        console.log(`ℹ️ Nenhum portfólio com ativos para atualizar`);
         // Recarregar portfólios para pegar valores atualizados
         await this.loadPortfolios();
       }
