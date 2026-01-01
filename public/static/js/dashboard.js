@@ -227,7 +227,15 @@ class DashboardManager {
 
       const result = await response.json();
       this.showNotification('Ativo adicionado com sucesso!', 'success');
-      await this.loadPortfolios();
+      
+      // Se estiver no modal de detalhes, atualizar
+      if (this.selectedPortfolio && this.selectedPortfolio.id === data.portfolioId) {
+        await this.loadAssets(data.portfolioId);
+        this.showPortfolioDetails();
+      } else {
+        await this.loadPortfolios();
+      }
+      
       this.closeModal('addAssetModal');
       
       console.log('✅ Ativo adicionado:', result);
@@ -241,14 +249,191 @@ class DashboardManager {
     console.log('📊 Mostrando detalhes do portfólio:', this.selectedPortfolio);
     console.log('📈 Ativos:', this.assets);
     
-    // Exibir alerta temporário com os ativos
+    // Abrir modal de detalhes
+    const modal = document.getElementById('portfolioDetailsModal');
+    if (!modal) return;
+    
+    // Preencher informações do portfólio
+    document.getElementById('portfolioDetailsTitle').textContent = this.selectedPortfolio.name;
+    document.getElementById('portfolioDetailsDescription').textContent = this.selectedPortfolio.description || 'Sem descrição';
+    
+    // Calcular valores
+    const totalInvested = this.assets.reduce((sum, a) => sum + ((a.averageCost || 0) * (a.quantity || 0)), 0);
+    const totalValue = this.assets.reduce((sum, a) => sum + ((a.currentPrice || a.averageCost || 0) * (a.quantity || 0)), 0);
+    const profitLoss = totalValue - totalInvested;
+    
+    document.getElementById('portfolioDetailsTotalValue').textContent = `R$ ${this.formatMoney(totalValue)}`;
+    document.getElementById('portfolioDetailsInvested').textContent = `R$ ${this.formatMoney(totalInvested)}`;
+    document.getElementById('portfolioDetailsProfitLoss').textContent = `R$ ${this.formatMoney(profitLoss)}`;
+    document.getElementById('portfolioDetailsAssetsCount').textContent = this.assets.length;
+    
+    // Renderizar tabela de ativos
+    this.renderAssetsTable();
+    
+    // Renderizar gráficos
+    this.renderCharts();
+    
+    // Mostrar modal
+    modal.classList.remove('hidden');
+  }
+
+  renderAssetsTable() {
+    const tbody = document.getElementById('assetsTableBody');
+    const emptyMessage = document.getElementById('emptyAssetsMessage');
+    
+    if (!tbody) return;
+    
     if (this.assets.length === 0) {
-      this.showNotification(`Portfólio "${this.selectedPortfolio.name}" não possui ativos ainda`, 'info');
-    } else {
-      const assetsList = this.assets.map(a => 
-        `${a.ticker}: ${a.quantity} unidades @ R$ ${this.formatMoney(a.averageCost || 0)}`
-      ).join('\n');
-      alert(`📊 Ativos do portfólio "${this.selectedPortfolio.name}":\n\n${assetsList}`);
+      tbody.innerHTML = '';
+      if (emptyMessage) emptyMessage.classList.remove('hidden');
+      return;
+    }
+    
+    if (emptyMessage) emptyMessage.classList.add('hidden');
+    
+    tbody.innerHTML = this.assets.map(asset => {
+      const totalValue = (asset.averageCost || 0) * (asset.quantity || 0);
+      const typeLabels = {
+        'stock': 'Ação',
+        'fii': 'FII',
+        'etf': 'ETF',
+        'crypto': 'Cripto',
+        'other': 'Outro'
+      };
+      
+      return `
+        <tr class="hover:bg-gray-50">
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center">
+              <span class="text-sm font-bold text-gray-900">${asset.ticker}</span>
+            </div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+              ${typeLabels[asset.type] || asset.type}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
+            ${asset.quantity || 0}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
+            R$ ${this.formatMoney(asset.averageCost || 0)}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-gray-900">
+            R$ ${this.formatMoney(totalValue)}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+            <button onclick="dashboard.openEditAssetModal('${asset.id}')" class="text-blue-600 hover:text-blue-900 mr-3">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button onclick="dashboard.deleteAsset('${asset.id}')" class="text-red-600 hover:text-red-900">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  renderCharts() {
+    // Gráfico de Distribuição por Ativo
+    const assetChartCanvas = document.getElementById('assetDistributionChart');
+    if (assetChartCanvas && this.assets.length > 0) {
+      const ctx = assetChartCanvas.getContext('2d');
+      
+      // Destruir gráfico anterior se existir
+      if (window.assetChart) window.assetChart.destroy();
+      
+      const data = this.assets.map(a => ({
+        label: a.ticker,
+        value: (a.averageCost || 0) * (a.quantity || 0)
+      }));
+      
+      window.assetChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: data.map(d => d.label),
+          datasets: [{
+            data: data.map(d => d.value),
+            backgroundColor: [
+              '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
+              '#EC4899', '#06B6D4', '#84CC16', '#F97316', '#6366F1'
+            ]
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            },
+            tooltip: {
+              callbacks: {
+                label: (context) => {
+                  const value = context.parsed;
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percent = ((value / total) * 100).toFixed(1);
+                  return `${context.label}: R$ ${this.formatMoney(value)} (${percent}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    // Gráfico de Distribuição por Tipo
+    const typeChartCanvas = document.getElementById('typeDistributionChart');
+    if (typeChartCanvas && this.assets.length > 0) {
+      const ctx = typeChartCanvas.getContext('2d');
+      
+      // Destruir gráfico anterior se existir
+      if (window.typeChart) window.typeChart.destroy();
+      
+      const typeData = {};
+      this.assets.forEach(a => {
+        const value = (a.averageCost || 0) * (a.quantity || 0);
+        typeData[a.type] = (typeData[a.type] || 0) + value;
+      });
+      
+      const typeLabels = {
+        'stock': 'Ações',
+        'fii': 'FIIs',
+        'etf': 'ETFs',
+        'crypto': 'Criptos',
+        'other': 'Outros'
+      };
+      
+      window.typeChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(typeData).map(k => typeLabels[k] || k),
+          datasets: [{
+            data: Object.values(typeData),
+            backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            },
+            tooltip: {
+              callbacks: {
+                label: (context) => {
+                  const value = context.parsed;
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percent = ((value / total) * 100).toFixed(1);
+                  return `${context.label}: R$ ${this.formatMoney(value)} (${percent}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
     }
   }
 
@@ -265,11 +450,84 @@ class DashboardManager {
   }
 
   openAddAssetModal(portfolioId) {
+    const pid = portfolioId || this.selectedPortfolio?.id;
     const modal = document.getElementById('addAssetModal');
-    if (modal) {
-      document.getElementById('assetPortfolioId').value = portfolioId;
+    if (modal && pid) {
+      document.getElementById('assetPortfolioId').value = pid;
       modal.classList.remove('hidden');
       document.getElementById('assetTicker').focus();
+    }
+  }
+
+  openEditAssetModal(assetId) {
+    const asset = this.assets.find(a => a.id === assetId);
+    if (!asset) return;
+    
+    const modal = document.getElementById('editAssetModal');
+    if (!modal) return;
+    
+    // Preencher formulário
+    document.getElementById('editAssetId').value = asset.id;
+    document.getElementById('editAssetPortfolioId').value = asset.portfolioId;
+    document.getElementById('editAssetTicker').value = asset.ticker;
+    document.getElementById('editAssetType').value = asset.type;
+    document.getElementById('editAssetQuantity').value = asset.quantity || 0;
+    document.getElementById('editAssetPrice').value = asset.averageCost || 0;
+    
+    modal.classList.remove('hidden');
+    document.getElementById('editAssetQuantity').focus();
+  }
+
+  async updateAsset(assetId, data) {
+    try {
+      const token = window.authService.getToken();
+      const response = await fetch(`/api/assets/${assetId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) throw new Error('Erro ao atualizar ativo');
+
+      const result = await response.json();
+      this.showNotification('Ativo atualizado com sucesso!', 'success');
+      await this.loadAssets(this.selectedPortfolio.id);
+      this.showPortfolioDetails();
+      this.closeModal('editAssetModal');
+      
+      console.log('✅ Ativo atualizado:', result);
+    } catch (error) {
+      console.error('❌ Erro ao atualizar ativo:', error);
+      this.showNotification('Erro ao atualizar ativo', 'error');
+    }
+  }
+
+  async deleteAsset(assetId) {
+    if (!confirm('Tem certeza que deseja excluir este ativo?')) return;
+    
+    try {
+      const token = window.authService.getToken();
+      const portfolioId = this.selectedPortfolio.id;
+      const response = await fetch(`/api/assets/${assetId}?portfolioId=${portfolioId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) throw new Error('Erro ao excluir ativo');
+
+      this.showNotification('Ativo excluído com sucesso!', 'success');
+      await this.loadAssets(portfolioId);
+      this.showPortfolioDetails();
+      
+      console.log('✅ Ativo excluído');
+    } catch (error) {
+      console.error('❌ Erro ao excluir ativo:', error);
+      this.showNotification('Erro ao excluir ativo', 'error');
     }
   }
 
@@ -385,6 +643,24 @@ class DashboardManager {
         };
         console.log('📤 Enviando dados do ativo:', data);
         this.addAsset(data);
+      });
+    }
+
+    // Form de Editar Ativo
+    const editAssetForm = document.getElementById('editAssetForm');
+    if (editAssetForm) {
+      editAssetForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const assetId = document.getElementById('editAssetId').value;
+        const data = {
+          portfolioId: document.getElementById('editAssetPortfolioId').value,
+          type: document.getElementById('editAssetType').value,
+          quantity: parseFloat(document.getElementById('editAssetQuantity').value) || 0,
+          averageCost: parseFloat(document.getElementById('editAssetPrice').value) || 0,
+          currentPrice: parseFloat(document.getElementById('editAssetPrice').value) || 0
+        };
+        console.log('📤 Atualizando ativo:', assetId, data);
+        this.updateAsset(assetId, data);
       });
     }
 
