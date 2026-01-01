@@ -8,7 +8,8 @@
   ],
   "vars": {
     "FIREBASE_PROJECT_ID": "yieldlab-76d87",
-    "FIREBASE_API_KEY": "AIzaSyDf2WKMfvtd8Pv_BlS2W928bqp24_v-pew"
+    "FIREBASE_API_KEY": "AIzaSyDf2WKMfvtd8Pv_BlS2W928bqp24_v-pew",
+    "BRAPI_API_TOKEN": "x5TVFoHfyeAHT3FqJXnWr2"
   }
   // "kv_namespaces": [
   //   {

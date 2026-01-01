@@ -47,9 +47,10 @@ quotes.post('/update-portfolio/:portfolioId', async (c) => {
     
     // Buscar cotações
     const tickers = assets.map(a => a.ticker);
-    console.log(`📊 Buscando cotações para: ${tickers.join(', ')}`);
+    const apiToken = c.env?.BRAPI_API_TOKEN;
+    console.log(`📊 Buscando cotações para: ${tickers.join(', ')}${apiToken ? ' (com token PRO)' : ' (sem token)'}`);
     
-    const quotes = await YFinanceService.getQuotes(tickers);
+    const quotes = await YFinanceService.getQuotes(tickers, apiToken);
     console.log(`📈 Cotações retornadas:`, Array.from(quotes.entries()));
     
     // Atualizar cada ativo
@@ -104,7 +105,8 @@ quotes.post('/update-portfolio/:portfolioId', async (c) => {
 quotes.get('/:ticker', async (c) => {
   try {
     const ticker = c.req.param('ticker');
-    const quote = await YFinanceService.getQuote(ticker);
+    const apiToken = c.env?.BRAPI_API_TOKEN;
+    const quote = await YFinanceService.getQuote(ticker, apiToken);
     
     if (!quote) {
       return c.json({

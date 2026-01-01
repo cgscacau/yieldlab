@@ -17,12 +17,14 @@ export class YFinanceService {
   /**
    * Busca cotação de um único ticker
    */
-  static async getQuote(ticker: string): Promise<StockQuote | null> {
+  static async getQuote(ticker: string, apiToken?: string): Promise<StockQuote | null> {
     try {
       // Remover sufixo .SA se tiver (Brapi não usa)
       const symbol = ticker.toUpperCase().replace('.SA', '');
       
-      const response = await fetch(`${this.API_URL}/${symbol}?range=1d&interval=1d`);
+      // Adicionar token se disponível
+      const tokenParam = apiToken ? `&token=${apiToken}` : '';
+      const response = await fetch(`${this.API_URL}/${symbol}?range=1d&interval=1d${tokenParam}`);
       
       if (!response.ok) {
         console.error(`Brapi error for ${symbol}:`, response.status);
@@ -54,7 +56,7 @@ export class YFinanceService {
   /**
    * Busca cotações de múltiplos tickers em uma única requisição
    */
-  static async getQuotes(tickers: string[]): Promise<Map<string, StockQuote>> {
+  static async getQuotes(tickers: string[], apiToken?: string): Promise<Map<string, StockQuote>> {
     const quotes = new Map<string, StockQuote>();
     
     if (tickers.length === 0) return quotes;
@@ -63,7 +65,9 @@ export class YFinanceService {
       // Remover sufixo .SA e juntar tickers com vírgula
       const symbols = tickers.map(t => t.toUpperCase().replace('.SA', '')).join(',');
       
-      const response = await fetch(`${this.API_URL}/${symbols}?range=1d&interval=1d`);
+      // Adicionar token se disponível
+      const tokenParam = apiToken ? `&token=${apiToken}` : '';
+      const response = await fetch(`${this.API_URL}/${symbols}?range=1d&interval=1d${tokenParam}`);
       
       if (!response.ok) {
         console.error(`Brapi error for multiple tickers:`, response.status);
