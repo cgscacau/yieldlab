@@ -603,14 +603,19 @@ class DashboardManager {
   }
 
   async updateQuotes() {
-    if (!this.selectedPortfolio) return;
+    if (!this.selectedPortfolio) {
+      console.warn('⚠️ Nenhum portfólio selecionado');
+      return;
+    }
     
     try {
       const token = window.authService.getToken();
       const portfolioId = this.selectedPortfolio.id;
       
-      this.showNotification('Atualizando cotações...', 'info');
       console.log('🔄 Atualizando cotações do portfólio:', portfolioId);
+      console.log('🔑 Token:', token ? 'Presente' : 'AUSENTE');
+      
+      this.showNotification('Atualizando cotações...', 'info');
       
       const response = await fetch(`/api/quotes/update-portfolio/${portfolioId}`, {
         method: 'POST',
@@ -619,7 +624,13 @@ class DashboardManager {
         }
       });
 
-      if (!response.ok) throw new Error('Erro ao atualizar cotações');
+      console.log('📡 Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('❌ Erro da API:', errorData);
+        throw new Error(errorData.error || 'Erro ao atualizar cotações');
+      }
 
       const result = await response.json();
       
