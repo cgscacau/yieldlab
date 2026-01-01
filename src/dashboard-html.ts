@@ -18,7 +18,13 @@ export const DASHBOARD_HTML = `<!DOCTYPE html>
                     <span class="text-2xl font-bold text-gray-900">YieldLab</span>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <span id="userEmail" class="text-gray-700"></span>
+                    <a href="/" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-home mr-1"></i>Home
+                    </a>
+                    <a href="/quotes" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-chart-bar mr-1"></i>Cotações
+                    </a>
+                    <span id="userEmail" class="text-gray-700 font-medium"></span>
                     <button id="logoutBtn" class="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700">
                         <i class="fas fa-sign-out-alt mr-2"></i>Sair
                     </button>

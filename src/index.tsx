@@ -261,11 +261,16 @@ app.get('/login', (c) => {
             </p>
         </div>
 
-        <!-- Back to Home -->
-        <div class="mt-6 text-center">
+        <!-- Links -->
+        <div class="mt-6 text-center space-x-4">
             <a href="/" class="text-sm text-indigo-600 hover:underline">
-                <i class="fas fa-arrow-left mr-1"></i>
-                Voltar para home
+                <i class="fas fa-home mr-1"></i>
+                Home
+            </a>
+            <span class="text-gray-400">|</span>
+            <a href="/quotes" class="text-sm text-indigo-600 hover:underline">
+                <i class="fas fa-chart-bar mr-1"></i>
+                Ver Cotações
             </a>
         </div>
     </div>
@@ -575,6 +580,10 @@ app.get('/', (c) => {
                         <span class="text-2xl font-bold text-gray-900">YieldLab</span>
                     </div>
                     <div class="flex items-center space-x-4">
+                        <a href="/quotes" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-chart-bar mr-1"></i>
+                            Cotações
+                        </a>
                         <a href="/dashboard" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
                             Dashboard
                         </a>
