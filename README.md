@@ -4,8 +4,10 @@ Sistema completo de gestão de investimentos desenvolvido com **Hono Framework**
 
 ## 🚀 Demo Online
 
-- **Frontend**: https://3000-i526wzc55iht6poufrocc-02b9cc79.sandbox.novita.ai
-- **API Health Check**: https://3000-i526wzc55iht6poufrocc-02b9cc79.sandbox.novita.ai/api/health
+- **Sandbox**: https://3000-ig8mf8il3ksar3mnxnn5e-82b888ba.sandbox.novita.ai
+- **API Health**: https://3000-ig8mf8il3ksar3mnxnn5e-82b888ba.sandbox.novita.ai/api/health
+- **GitHub**: https://github.com/cgscacau/yieldlab
+- **Backup**: https://www.genspark.ai/api/files/s/udhE94Xa
 
 ## ✨ Funcionalidades
 
