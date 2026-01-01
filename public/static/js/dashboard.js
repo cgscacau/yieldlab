@@ -36,13 +36,36 @@ class DashboardManager {
   async loadPortfolios() {
     try {
       const token = window.authService.getToken();
+      
+      console.log('🔑 Token:', token ? 'Presente' : 'Ausente');
+      console.log('👤 Usuário:', window.authService.getCurrentUser());
+      
+      if (!token) {
+        console.error('❌ Token não encontrado!');
+        window.location.href = '/login';
+        return;
+      }
+      
       const response = await fetch('/api/portfolios', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
-      if (!response.ok) throw new Error('Erro ao carregar portfólios');
+      console.log('📡 Response status:', response.status);
+
+      if (response.status === 401) {
+        console.error('❌ Token inválido ou expirado');
+        window.authService.logout();
+        window.location.href = '/login';
+        return;
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('❌ Erro na API:', errorData);
+        throw new Error(errorData.error || 'Erro ao carregar portfólios');
+      }
 
       const data = await response.json();
       this.portfolios = data.data || data.portfolios || [];
