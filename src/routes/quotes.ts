@@ -47,7 +47,10 @@ quotes.post('/update-portfolio/:portfolioId', async (c) => {
     
     // Buscar cotações
     const tickers = assets.map(a => a.ticker);
+    console.log(`📊 Buscando cotações para: ${tickers.join(', ')}`);
+    
     const quotes = await YFinanceService.getQuotes(tickers);
+    console.log(`📈 Cotações retornadas:`, Array.from(quotes.entries()));
     
     // Atualizar cada ativo
     let updated = 0;
@@ -55,6 +58,7 @@ quotes.post('/update-portfolio/:portfolioId', async (c) => {
     
     for (const asset of assets) {
       const quote = quotes.get(asset.ticker.toUpperCase());
+      console.log(`🔍 Ativo ${asset.ticker}:`, { quote, hasQuote: !!quote, price: quote?.price });
       
       if (quote && quote.price > 0) {
         await firestore.updateAsset(asset.id, {
@@ -71,6 +75,9 @@ quotes.post('/update-portfolio/:portfolioId', async (c) => {
         });
         
         updated++;
+        console.log(`✅ Atualizado ${asset.ticker}: R$ ${asset.currentPrice || asset.averageCost} → R$ ${quote.price}`);
+      } else {
+        console.warn(`⚠️ Sem cotação para ${asset.ticker}`);
       }
     }
     
