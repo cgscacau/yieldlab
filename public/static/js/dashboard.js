@@ -41,7 +41,7 @@ class DashboardManager {
       if (!response.ok) throw new Error('Erro ao carregar portfólios');
 
       const data = await response.json();
-      this.portfolios = data.portfolios || [];
+      this.portfolios = data.data || data.portfolios || [];
       
       this.renderPortfolios();
       this.updateStats();
@@ -197,7 +197,7 @@ class DashboardManager {
       if (!response.ok) throw new Error('Erro ao carregar ativos');
 
       const data = await response.json();
-      this.assets = data.assets || [];
+      this.assets = data.data || data.assets || [];
       
       console.log('✅ Ativos carregados:', this.assets.length);
     } catch (error) {
