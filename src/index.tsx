@@ -167,6 +167,212 @@ app.get('/api/health', (c) => {
 // FRONTEND - Landing Page
 // ============================================================================
 
+// Rota de Login
+app.get('/login', (c) => {
+  return c.html(`<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - YieldLab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-indigo-500 to-purple-600 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
+        <!-- Logo -->
+        <div class="text-center mb-8">
+            <i class="fas fa-chart-line text-5xl text-indigo-600 mb-4"></i>
+            <h1 class="text-3xl font-bold text-gray-900">YieldLab</h1>
+            <p class="text-gray-600 mt-2">Gestão Inteligente de Investimentos</p>
+        </div>
+
+        <!-- Alert -->
+        <div id="alert" class="hidden mb-4 p-4 rounded-lg"></div>
+
+        <!-- Tabs -->
+        <div class="flex mb-6 border-b">
+            <button id="loginTab" class="flex-1 py-3 font-semibold text-indigo-600 border-b-2 border-indigo-600">
+                Login
+            </button>
+            <button id="registerTab" class="flex-1 py-3 font-semibold text-gray-500">
+                Registrar
+            </button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input type="email" id="loginEmail" required
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="seu@email.com">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Senha</label>
+                <input type="password" id="loginPassword" required
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="••••••••">
+            </div>
+            <button type="submit" 
+                class="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition flex items-center justify-center">
+                <i class="fas fa-sign-in-alt mr-2"></i>
+                Entrar
+            </button>
+        </form>
+
+        <!-- Register Form (Hidden) -->
+        <form id="registerForm" class="space-y-4 hidden">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Nome</label>
+                <input type="text" id="registerName" required
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="Seu nome">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input type="email" id="registerEmail" required
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="seu@email.com">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Senha</label>
+                <input type="password" id="registerPassword" required minlength="6"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="••••••••">
+                <p class="text-xs text-gray-500 mt-1">Mínimo 6 caracteres</p>
+            </div>
+            <button type="submit"
+                class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition flex items-center justify-center">
+                <i class="fas fa-user-plus mr-2"></i>
+                Criar Conta
+            </button>
+        </form>
+
+        <!-- Firebase Status -->
+        <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+            <p class="text-sm text-gray-600 text-center">
+                <i class="fas fa-shield-alt mr-2"></i>
+                <span id="firebaseStatus">Verificando Firebase...</span>
+            </p>
+        </div>
+
+        <!-- Back to Home -->
+        <div class="mt-6 text-center">
+            <a href="/" class="text-sm text-indigo-600 hover:underline">
+                <i class="fas fa-arrow-left mr-1"></i>
+                Voltar para home
+            </a>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/js/firebase-config.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const statusEl = document.getElementById('firebaseStatus');
+            
+            if (window.IS_FIREBASE_CONFIGURED) {
+                statusEl.innerHTML = '<i class="fas fa-check-circle text-green-600 mr-2"></i>Firebase Conectado';
+                console.log('✅ Firebase configurado:', window.FIREBASE_CONFIG.projectId);
+            } else {
+                statusEl.innerHTML = '<i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>Firebase não configurado';
+                showAlert('Firebase não configurado! Verifique firebase-config.js', 'error');
+            }
+        });
+
+        const loginTab = document.getElementById('loginTab');
+        const registerTab = document.getElementById('registerTab');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+
+        loginTab.addEventListener('click', () => {
+            loginTab.classList.add('text-indigo-600', 'border-b-2', 'border-indigo-600');
+            loginTab.classList.remove('text-gray-500');
+            registerTab.classList.remove('text-indigo-600', 'border-b-2', 'border-indigo-600');
+            registerTab.classList.add('text-gray-500');
+            loginForm.classList.remove('hidden');
+            registerForm.classList.add('hidden');
+        });
+
+        registerTab.addEventListener('click', () => {
+            registerTab.classList.add('text-indigo-600', 'border-b-2', 'border-indigo-600');
+            registerTab.classList.remove('text-gray-500');
+            loginTab.classList.remove('text-indigo-600', 'border-b-2', 'border-indigo-600');
+            loginTab.classList.add('text-gray-500');
+            registerForm.classList.remove('hidden');
+            loginForm.classList.add('hidden');
+        });
+
+        function showAlert(message, type = 'info') {
+            const alert = document.getElementById('alert');
+            alert.className = \`mb-4 p-4 rounded-lg \${
+                type === 'success' ? 'bg-green-100 text-green-800' :
+                type === 'error' ? 'bg-red-100 text-red-800' :
+                'bg-blue-100 text-blue-800'
+            }\`;
+            alert.innerHTML = \`
+                <div class="flex items-center">
+                    <i class="fas \${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'} mr-2"></i>
+                    \${message}
+                </div>
+            \`;
+            alert.classList.remove('hidden');
+            
+            if (type === 'success') {
+                setTimeout(() => alert.classList.add('hidden'), 5000);
+            }
+        }
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                showAlert('Autenticando...', 'info');
+                const user = await window.authService.login(email, password);
+                showAlert(\`Bem-vindo, \${user.email}!\`, 'success');
+                setTimeout(() => {
+                    window.location.href = '/dashboard';
+                }, 1500);
+            } catch (error) {
+                console.error('Login error:', error);
+                showAlert(error.message || 'Erro ao fazer login', 'error');
+            }
+        });
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+
+            try {
+                showAlert('Criando conta...', 'info');
+                const user = await window.authService.register(email, password, name);
+                showAlert(\`Conta criada! Bem-vindo, \${user.displayName}!\`, 'success');
+                setTimeout(() => {
+                    window.location.href = '/dashboard';
+                }, 1500);
+            } catch (error) {
+                console.error('Register error:', error);
+                showAlert(error.message || 'Erro ao criar conta', 'error');
+            }
+        });
+
+        if (window.authService && window.authService.isAuthenticated()) {
+            showAlert('Você já está logado!', 'success');
+            setTimeout(() => {
+                window.location.href = '/dashboard';
+            }, 1500);
+        }
+    </script>
+</body>
+</html>`);
+});
+
 app.get('/', (c) => {
   return c.html(`
     <!DOCTYPE html>
